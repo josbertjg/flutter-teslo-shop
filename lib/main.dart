@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:teslo_shop/config/config.dart';
-import 'package:teslo_shop/config/router/app_router.dart';
 
-void main() {
+void main() async {
+  await Enviroment.initEnviroment();
   runApp(const MainApp());
 }
 
