@@ -5,14 +5,18 @@ import 'package:teslo_shop/features/shared/shared.dart';
 
 part 'login_form_state.dart';
 
+typedef LoginUserCallback = void Function(String email, String password);
+
 class LoginFormCubit extends Cubit<LoginFormState> {
-  LoginFormCubit() : super(const LoginFormState());
+  final LoginUserCallback loginUserCallback;
+
+  LoginFormCubit({required this.loginUserCallback})
+      : super(const LoginFormState());
 
   void onFormSubmit() {
     _touchEveryField();
     if (!state.isValid) return;
-
-    print(state);
+    loginUserCallback(state.email.value, state.password.value);
   }
 
   void onEmailChange(String value) {

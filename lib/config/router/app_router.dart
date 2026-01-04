@@ -1,8 +1,10 @@
 import 'package:go_router/go_router.dart';
 import 'package:teslo_shop/features/auth/auth.dart';
 import 'package:teslo_shop/features/products/products.dart';
+import 'package:teslo_shop/features/shared/services/global_service.dart';
 
 final appRouter = GoRouter(
+  navigatorKey: GlobalService.navigatorKey,
   initialLocation: '/login',
   routes: [
     ///* Auth Routes

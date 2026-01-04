@@ -1,6 +1,6 @@
+import 'package:dio/dio.dart';
 import 'package:teslo_shop/features/auth/infrastructure/infrastructure.dart';
-import 'package:teslo_shop/features/auth/infrastructure/mappers/user_mapper.dart';
-
+import 'package:teslo_shop/features/shared/infrastructure/error_handler/error_handler.dart';
 import '../../../../config/config.dart';
 import '../../domain/domain.dart';
 
@@ -19,7 +19,10 @@ class AuthDatasourceImpl extends AuthDatasource {
       final user = UserMapper.userJsonToEntity(response.data);
       return user;
     } catch (error) {
-      throw WrongCredentials();
+      if (error is DioException && error.response?.statusCode == 401) {
+        throw WrongCredentials();
+      }
+      throw ErrorHandler.throwException(error);
     }
   }
 
