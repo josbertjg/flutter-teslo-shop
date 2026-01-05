@@ -41,7 +41,7 @@ class LoginScreen extends StatelessWidget {
               ),
               child: BlocProvider(
                 create: (context) => LoginFormCubit(
-                    loginUserCallback: context.read<AuthBloc>().loginUser),
+                    loginUserCallback: context.read<AuthBloc>().login),
                 child: const _LoginForm(),
               ),
             )

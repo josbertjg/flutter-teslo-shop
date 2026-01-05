@@ -6,9 +6,16 @@ import '../../domain/domain.dart';
 
 class AuthDatasourceImpl extends AuthDatasource {
   @override
-  Future<User> checkAuthStatus(String token) {
-    // TODO: implement checkAuthStatus
-    throw UnimplementedError();
+  Future<User> checkAuthStatus(String token) async {
+    try {
+      final response = await api.get("/auth/check-status",
+          options: Options(headers: {"Authorization": "Bearer $token"}));
+
+      final user = UserMapper.userJsonToEntity(response.data);
+      return user;
+    } catch (error) {
+      throw InvalidToken();
+    }
   }
 
   @override

@@ -19,6 +19,8 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<RegisterUser>(_onRegisterUser);
     on<CheckAuthStatus>(_onCheckAuthStatus);
     on<LogoutUser>(_onLogoutUser);
+
+    checkAuthStatus();
   }
 
   Future<void> _onLoginUser(LoginUser event, Emitter<AuthState> emit) async {
@@ -27,26 +29,39 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final user = await authRepository.login(
           email: event.email, password: event.password);
-      await _handleUserAuthentication(user, emit);
+      await _setLoggedUser(user, emit);
     } catch (error) {
       ErrorHandler.handleException(error);
-      await _handleLogout(emit, "Credenciales no son correctas");
+      logout("Credenciales no son correctas");
     }
   }
 
   Future<void> _onRegisterUser(
       RegisterUser event, Emitter<AuthState> emit) async {}
-  Future<void> _onCheckAuthStatus(
-      CheckAuthStatus event, Emitter<AuthState> emit) async {}
 
-  Future<void> _onLogoutUser(LogoutUser event, Emitter<AuthState> emit) async {
-    await _handleLogout(
-      emit,
-      event.errorMessage,
-    );
+  Future<void> _onCheckAuthStatus(
+      CheckAuthStatus event, Emitter<AuthState> emit) async {
+    final token = await keyValueStorageService.getValue<String>("token");
+    if (token == null) return logout();
+
+    try {
+      final user = await authRepository.checkAuthStatus(token);
+      _setLoggedUser(user, emit);
+    } catch (error) {
+      logout();
+      ErrorHandler.handleException(error);
+    }
   }
 
-  Future<void> _handleUserAuthentication(User user, Emitter<AuthState> emit) async {
+  Future<void> _onLogoutUser(LogoutUser event, Emitter<AuthState> emit) async {
+    await keyValueStorageService.removeKey("token");
+    emit(state.copyWith(
+        authStatus: AuthStatus.notAuthenticated,
+        user: null,
+        errorMessage: event.errorMessage));
+  }
+
+  Future<void> _setLoggedUser(User user, Emitter<AuthState> emit) async {
     await keyValueStorageService.setKeyValue("token", user.token);
     emit(state.copyWith(
       user: user,
@@ -55,15 +70,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     ));
   }
 
-  Future<void> _handleLogout(Emitter<AuthState> emit, [String? errorMessage]) async {
-    await keyValueStorageService.removeKey("token");
-    emit(state.copyWith(
-        authStatus: AuthStatus.notAuthenticated,
-        user: null,
-        errorMessage: errorMessage));
+  void login(String email, String password) {
+    add(LoginUser(email, password));
   }
 
-  void loginUser(String email, String password) {
-    add(LoginUser(email, password));
+  void logout([String? errorMessage]) {
+    add(LogoutUser(errorMessage));
+  }
+
+  void checkAuthStatus() {
+    add(CheckAuthStatus());
   }
 }

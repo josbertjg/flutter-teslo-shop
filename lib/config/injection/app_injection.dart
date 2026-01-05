@@ -14,6 +14,7 @@ class AppInjection {
         RepositoryProvider(create: (context) => AuthRepositoryImpl()),
         RepositoryProvider(create: (context) => KeyValueStorageServiceImpl()),
         // RepositoryProvider(create: (context) => PaymentRepository()),
+        // RepositoryProvider(create: (context) => PaymentRepository()),
       ],
       child: MultiBlocProvider(
         providers: [

@@ -30,11 +30,11 @@ class KeyValueStorageServiceImpl extends KeyValueStorageService {
   Future<T?> getValue<T>(String key) async {
     final prefs = await getSharedPrefs();
 
-    if (T is int) {
+    if (T == int) {
       return prefs.getInt(key) as T?;
-    } else if (T is String) {
+    } else if (T == String) {
       return prefs.getString(key) as T?;
-    } else if (T is bool) {
+    } else if (T == bool) {
       return prefs.getBool(key) as T?;
     } else {
       throw UnimplementedError("Tipo $T no soportado");
