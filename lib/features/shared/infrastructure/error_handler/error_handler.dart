@@ -1,6 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:teslo_shop/features/auth/infrastructure/infrastructure.dart';
-import 'package:teslo_shop/features/shared/services/global_service.dart';
+import 'package:teslo_shop/features/shared/infrastructure/services/global_service.dart';
 
 class ErrorHandler {
   static Exception throwException(Object error) {

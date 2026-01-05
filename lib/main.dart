@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:teslo_shop/config/config.dart';
 import 'package:teslo_shop/config/injection/app_injection.dart';
-import 'package:teslo_shop/features/shared/services/global_service.dart';
+import 'package:teslo_shop/features/shared/infrastructure/services/global_service.dart';
 
 void main() async {
   await Enviroment.initEnviroment();

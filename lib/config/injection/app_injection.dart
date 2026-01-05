@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:teslo_shop/features/auth/infrastructure/infrastructure.dart';
 import 'package:teslo_shop/features/auth/presentation/blocs/auth/auth_bloc.dart';
+import 'package:teslo_shop/features/shared/infrastructure/services/key_value_storage_service_impl.dart';
 // Importas tus repositorios y blocs...
 
 class AppInjection {
@@ -11,14 +12,16 @@ class AppInjection {
     return MultiRepositoryProvider(
       providers: [
         RepositoryProvider(create: (context) => AuthRepositoryImpl()),
-        // RepositoryProvider(create: (context) => DoctorRepository()),
+        RepositoryProvider(create: (context) => KeyValueStorageServiceImpl()),
         // RepositoryProvider(create: (context) => PaymentRepository()),
       ],
       child: MultiBlocProvider(
         providers: [
           BlocProvider(
-              create: (context) =>
-                  AuthBloc(authRepository: context.read<AuthRepositoryImpl>())),
+              create: (context) => AuthBloc(
+                  authRepository: context.read<AuthRepositoryImpl>(),
+                  keyValueStorageService:
+                      context.read<KeyValueStorageServiceImpl>())),
           // BlocProvider(
           //   create: (context) => AuthBloc(
           //     repository: context.read<AuthRepository>(),
