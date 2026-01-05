@@ -46,7 +46,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
     try {
       final user = await authRepository.checkAuthStatus(token);
-      _setLoggedUser(user, emit);
+      await _setLoggedUser(user, emit);
     } catch (error) {
       logout();
       ErrorHandler.handleException(error);
@@ -63,6 +63,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
 
   Future<void> _setLoggedUser(User user, Emitter<AuthState> emit) async {
     await keyValueStorageService.setKeyValue("token", user.token);
+    print('🟢 Emitiendo estado: AuthStatus.authenticated');
     emit(state.copyWith(
       user: user,
       authStatus: AuthStatus.authenticated,
