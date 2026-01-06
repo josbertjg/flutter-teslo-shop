@@ -41,8 +41,36 @@ class AppRouter {
       ),
     ],
     redirect: (context, state) {
-      print(state.fullPath);
-      return "/login";
+      final isGoingTo = state.matchedLocation;
+      final authStatus = authBloc.state.authStatus;
+
+      // Si va al splash screen y se esta chequeando el auth status entonces se le permite estar alli
+      if (isGoingTo == "/splash" && authStatus == AuthStatus.checking) {
+        return null;
+      }
+
+      // Si no esta autenticado, verifico a donde quiere ir
+      if (authStatus == AuthStatus.notAuthenticated) {
+        // Si quiere ir a login o register se le permite porque no esta autenticado
+        if (isGoingTo == "/login" || isGoingTo == "/register") return null;
+
+        return "/login"; // De ñp contrario, si quiere ir a alguna otra ruta se le obliga a redirigirse siempre a login
+      }
+
+      // Si esta autenticado verifico a donde quiere ir
+      if (authStatus == AuthStatus.authenticated) {
+        // Si estando autenticado quiere ir a login, register o al splash entonces se le obliga a estar siempre en el root
+        if (isGoingTo == "/login" ||
+            isGoingTo == "/register" ||
+            isGoingTo == "/splash") {
+          return "/";
+        }
+
+        return null; // Caso contrario, se le permite ir a donde quiera
+      }
+
+      // Ya en este punto, todas mis rutas estaran validadas
+      return null;
     },
   );
 }

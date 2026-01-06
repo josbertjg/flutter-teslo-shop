@@ -27,10 +27,12 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     await Future.delayed(const Duration(milliseconds: 500));
 
     try {
+      emit(state.copyWith(isLoading: true));
       final user = await authRepository.login(
           email: event.email, password: event.password);
       await _setLoggedUser(user, emit);
     } catch (error) {
+      emit(state.copyWith(isLoading: false));
       ErrorHandler.handleException(error);
       logout("Credenciales no son correctas");
     }
@@ -54,11 +56,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   Future<void> _onLogoutUser(LogoutUser event, Emitter<AuthState> emit) async {
+    emit(state.copyWith(isLoading: true));
+
     await keyValueStorageService.removeKey("token");
     emit(state.copyWith(
-        authStatus: AuthStatus.notAuthenticated,
-        user: null,
-        errorMessage: event.errorMessage));
+      authStatus: AuthStatus.notAuthenticated,
+      user: null,
+      errorMessage: event.errorMessage,
+      isLoading: false,
+    ));
   }
 
   Future<void> _setLoggedUser(User user, Emitter<AuthState> emit) async {
@@ -68,6 +74,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       user: user,
       authStatus: AuthStatus.authenticated,
       errorMessage: "",
+      isLoading: false,
     ));
   }
 

@@ -90,6 +90,7 @@ class _LoginForm extends StatelessWidget {
               child: CustomFilledButton(
                 text: 'Ingresar',
                 buttonColor: Colors.black,
+                loading: context.watch<AuthBloc>().state.isLoading,
                 onPressed: () {
                   loginForm.onFormSubmit();
                 },
