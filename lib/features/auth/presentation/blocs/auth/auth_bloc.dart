@@ -2,7 +2,7 @@ import 'package:bloc_concurrency/bloc_concurrency.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:teslo_shop/features/shared/domain/services/key_value_storage_service.dart';
-import 'package:teslo_shop/features/shared/infrastructure/error_handler/error_handler.dart';
+import 'package:teslo_shop/features/shared/infrastructure/services/global_service.dart';
 
 import '../../../domain/domain.dart';
 
@@ -26,16 +26,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   Future<void> _onLoginUser(LoginUser event, Emitter<AuthState> emit) async {
     await Future.delayed(const Duration(milliseconds: 500));
 
-    try {
-      emit(state.copyWith(isLoading: true));
-      final user = await authRepository.login(
-          email: event.email, password: event.password);
-      await _setLoggedUser(user, emit);
-    } catch (error) {
+    emit(state.copyWith(isLoading: true));
+    final result = await authRepository.login(
+        email: event.email, password: event.password);
+
+    result.fold((error) {
       emit(state.copyWith(isLoading: false));
-      ErrorHandler.handleException(error);
+      GlobalService.showSnackbar(error.message);
       logout("Credenciales no son correctas");
-    }
+    }, (user) async => await _setLoggedUser(user, emit));
   }
 
   Future<void> _onRegisterUser(
@@ -46,13 +45,11 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final token = await keyValueStorageService.getValue<String>("token");
     if (token == null) return logout();
 
-    try {
-      final user = await authRepository.checkAuthStatus(token);
-      await _setLoggedUser(user, emit);
-    } catch (error) {
+    final result = await authRepository.checkAuthStatus(token);
+    result.fold((error) {
       logout();
-      ErrorHandler.handleException(error);
-    }
+      GlobalService.showSnackbar(error.message);
+    }, (user) async => await _setLoggedUser(user, emit));
   }
 
   Future<void> _onLogoutUser(LogoutUser event, Emitter<AuthState> emit) async {

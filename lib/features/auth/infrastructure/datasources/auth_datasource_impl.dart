@@ -14,7 +14,7 @@ class AuthDatasourceImpl extends AuthDatasource {
       final user = UserMapper.userJsonToEntity(response.data);
       return user;
     } catch (error) {
-      throw InvalidToken();
+      throw InvalidTokenException();
     }
   }
 
@@ -27,7 +27,7 @@ class AuthDatasourceImpl extends AuthDatasource {
       return user;
     } catch (error) {
       if (error is DioException && error.response?.statusCode == 401) {
-        throw WrongCredentials();
+        throw WrongCredentialsException();
       }
       throw ErrorHandler.throwException(error);
     }
